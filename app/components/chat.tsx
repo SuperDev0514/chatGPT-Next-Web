@@ -760,6 +760,8 @@ function _Chat() {
     }
   };
 
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
   const doSubmit = (userInput: string) => {
     if (userInput.trim() === "") return;
     const matchCommand = chatCommands.match(userInput);
@@ -770,10 +772,7 @@ function _Chat() {
       return;
     }
     setIsLoading(true);
-    chatStore
-      .onUserInput(userInput, attachImages)
-      .then(() => setIsLoading(false));
-    setAttachImages([]);
+
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -1491,14 +1490,7 @@ function _Chat() {
             onSearch("");
           }}
         />
-        <label
-          className={`${styles["chat-input-panel-inner"]} ${
-            attachImages.length != 0
-              ? styles["chat-input-panel-inner-attach"]
-              : ""
-          }`}
-          htmlFor="chat-input"
-        >
+
           <textarea
             id="chat-input"
             ref={inputRef}
