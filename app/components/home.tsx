@@ -27,9 +27,7 @@ import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
-import { ClientApi } from "../client/api";
-import { useAccessStore } from "../store";
-import { identifyDefaultClaudeModel } from "../utils/checkers";
+
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -129,8 +127,7 @@ function Screen() {
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
   const isMobileScreen = useMobileScreen();
-  const shouldTightBorder =
-    getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
+
 
   useEffect(() => {
     loadAsyncGoogleFont();

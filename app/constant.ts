@@ -49,12 +49,20 @@ export enum StoreKey {
   Prompt = "prompt-store",
   Update = "chat-update",
   Sync = "sync",
+  Provider = "provider",
 }
 
-export const DEFAULT_SIDEBAR_WIDTH = 300;
-export const MAX_SIDEBAR_WIDTH = 500;
-export const MIN_SIDEBAR_WIDTH = 230;
 export const NARROW_SIDEBAR_WIDTH = 100;
+
+export const DEFAULT_SIDEBAR_WIDTH = 340;
+export const MAX_SIDEBAR_WIDTH = 440;
+export const MIN_SIDEBAR_WIDTH = 230;
+
+export const WINDOW_WIDTH_SM = 480;
+export const WINDOW_WIDTH_MD = 768;
+export const WINDOW_WIDTH_LG = 1120;
+export const WINDOW_WIDTH_XL = 1440;
+export const WINDOW_WIDTH_2XL = 1980;
 
 export const ACCESS_CODE_PREFIX = "nk-";
 
@@ -103,6 +111,7 @@ export const Azure = {
 export const Google = {
   ExampleEndpoint: "https://generativelanguage.googleapis.com/",
   ChatPath: (modelName: string) => `v1beta/models/${modelName}:generateContent`,
+
 };
 
 export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
@@ -131,6 +140,8 @@ export const KnowledgeCutOffDate: Record<string, string> = {
   "gpt-4-turbo": "2023-12",
   "gpt-4-turbo-2024-04-09": "2023-12",
   "gpt-4-turbo-preview": "2023-12",
+  "gpt-4o": "2023-10",
+  "gpt-4o-2024-05-13": "2023-10",
   "gpt-4-vision-preview": "2023-04",
   // After improvements,
   // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
@@ -144,12 +155,16 @@ const openaiModels = [
   "gpt-4-32k",
   "gpt-4-turbo",
   "gpt-4-turbo-preview",
+  "gpt-4o",
+  "gpt-4o-2024-05-13",
   "gpt-4-vision-preview",
+
 ];
 
 const googleModels = [
   "gemini-1.0-pro",
   "gemini-1.5-pro-latest",
+  "gemini-1.5-flash-latest",
   "gemini-pro-vision",
 ];
 
@@ -217,3 +232,5 @@ export const internalAllowedWebDavEndpoints = [
   "https://webdav.yandex.com",
   "https://app.koofr.net/dav/Koofr",
 ];
+
+export const SIDEBAR_ID = "sidebar";
