@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import { showToast } from "./components/ui-lib";
 import Locale from "./locales";
 import { RequestMessage } from "./client/api";
@@ -254,4 +255,13 @@ export function isVisionModel(model: string) {
   return (
     visionKeywords.some((keyword) => model.includes(keyword)) || isGpt4Turbo
   );
+}
+
+export function getTime(dateTime: string) {
+  const time = dayjs(dateTime);
+  const now = dayjs();
+  if (time.isBefore(now, "date")) {
+    return time.format("MM-DD");
+  }
+  return time.format("hh:mm");
 }

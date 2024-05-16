@@ -7,6 +7,9 @@ import {
   StoreKey,
 } from "../constant";
 import { createPersistStore } from "../utils/store";
+import System from "@/app/icons/systemIcon.svg";
+import Light from "@/app/icons/lightIcon.svg";
+import Dark from "@/app/icons/darkIcon.svg";
 
 export type ModelType = (typeof DEFAULT_MODELS)[number]["name"];
 
@@ -24,7 +27,6 @@ export enum Theme {
   Light = "light",
 }
 
-const config = getClientConfig();
 
 export const DEFAULT_CONFIG = {
   lastUpdate: Date.now(), // timestamp, to merge state
@@ -45,6 +47,8 @@ export const DEFAULT_CONFIG = {
 
   customModels: "",
   models: DEFAULT_MODELS as any as LLMModel[],
+
+  isMobileScreen: false,
 
   modelConfig: {
     model: "gpt-3.5-turbo" as ModelType,
