@@ -116,11 +116,28 @@ function escapeDollarNumber(text: string) {
   return escapedText;
 }
 
-function _MarkDownContent(props: { content: string }) {
-  const escapedContent = useMemo(
-    () => escapeDollarNumber(props.content),
-    [props.content],
+function escapeBrackets(text: string) {
+  const pattern =
+    /(```[\s\S]*?```|`.*?`)|\\\[([\s\S]*?[^\\])\\\]|\\\((.*?)\\\)/g;
+  return text.replace(
+    pattern,
+    (match, codeBlock, squareBracket, roundBracket) => {
+      if (codeBlock) {
+        return codeBlock;
+      } else if (squareBracket) {
+        return `$$${squareBracket}$$`;
+      } else if (roundBracket) {
+        return `$${roundBracket}$`;
+      }
+      return match;
+    },
   );
+}
+
+function _MarkDownContent(props: { content: string }) {
+  const escapedContent = useMemo(() => {
+    return escapeBrackets(escapeDollarNumber(props.content));
+  }, [props.content]);
 
   return (
     <ReactMarkdown
@@ -160,13 +177,14 @@ export function Markdown(
     fontSize?: number;
     parentRef?: RefObject<HTMLDivElement>;
     defaultShow?: boolean;
+    className?: string;
   } & React.DOMAttributes<HTMLDivElement>,
 ) {
   const mdRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
-      className="markdown-body"
+      className={`markdown-body ${props.className}`}
       style={{
         fontSize: `${props.fontSize ?? 14}px`,
       }}

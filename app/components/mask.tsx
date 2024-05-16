@@ -1,5 +1,4 @@
 import { IconButton } from "./button";
-import { ErrorBoundary } from "./error";
 
 import styles from "./mask.module.scss";
 
@@ -22,7 +21,7 @@ import {
   useAppConfig,
   useChatStore,
 } from "../store";
-import { ROLES } from "../client/api";
+import { MultimodalContent, ROLES } from "../client/api";
 import {
   Input,
   List,
@@ -38,7 +37,12 @@ import { useNavigate } from "react-router-dom";
 
 import chatStyle from "./chat.module.scss";
 import { useEffect, useState } from "react";
-import { copyToClipboard, downloadAs, readFromFile } from "../utils";
+import {
+  copyToClipboard,
+  downloadAs,
+  getMessageImages,
+  readFromFile,
+} from "../utils";
 import { Updater } from "../typing";
 import { ModelConfigList } from "./model-config";
 import { FileName, Path } from "../constant";
@@ -50,6 +54,8 @@ import {
   Draggable,
   OnDragEndResponder,
 } from "@hello-pangea/dnd";
+import { getMessageTextContent } from "../utils";
+import useMobileScreen from "@/app/hooks/useMobileScreen";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -244,7 +250,7 @@ function ContextPromptItem(props: {
         </>
       )}
       <Input
-        value={props.prompt.content}
+        value={getMessageTextContent(props.prompt)}
         type="text"
         className={chatStyle["context-content"]}
         rows={focusingInput ? 5 : 1}
@@ -289,7 +295,18 @@ export function ContextPrompts(props: {
   };
 
   const updateContextPrompt = (i: number, prompt: ChatMessage) => {
-    props.updateContext((context) => (context[i] = prompt));
+    props.updateContext((context) => {
+      const images = getMessageImages(context[i]);
+      context[i] = prompt;
+      if (images.length > 0) {
+        const text = getMessageTextContent(context[i]);
+        const newContext: MultimodalContent[] = [{ type: "text", text }];
+        for (const img of images) {
+          newContext.push({ type: "image_url", image_url: { url: img } });
+        }
+        context[i].content = newContext;
+      }
+    });
   };
 
   const onDragEnd: OnDragEndResponder = (result) => {
@@ -381,13 +398,22 @@ export function ContextPrompts(props: {
   );
 }
 
-export function MaskPage() {
+export function MaskPage(props: { className?: string }) {
   const navigate = useNavigate();
 
   const maskStore = useMaskStore();
   const chatStore = useChatStore();
 
-  const [filterLang, setFilterLang] = useState<Lang>();
+  const [filterLang, setFilterLang] = useState<Lang | undefined>(
+    () => localStorage.getItem("Mask-language") as Lang | undefined,
+  );
+  useEffect(() => {
+    if (filterLang) {
+      localStorage.setItem("Mask-language", filterLang);
+    } else {
+      localStorage.removeItem("Mask-language");
+    }
+  }, [filterLang]);
 
   const allMasks = maskStore
     .getAll()
@@ -440,8 +466,13 @@ export function MaskPage() {
   };
 
   return (
-    <ErrorBoundary>
-      <div className={styles["mask-page"]}>
+    <>
+      <div
+        className={`
+          ${styles["mask-page"]} 
+          ${props.className}
+          `}
+      >
         <div className="window-header">
           <div className="window-header-title">
             <div className="window-header-main-title">
@@ -619,6 +650,6 @@ export function MaskPage() {
           </Modal>
         </div>
       )}
-    </ErrorBoundary>
+    </>
   );
 }

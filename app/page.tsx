@@ -1,6 +1,6 @@
 import { Analytics } from "@vercel/analytics/react";
 
-import { Home } from "./components/home";
+import Home from "@/app/containers";
 
 import { getServerSideConfig } from "./config/server";
 
@@ -10,7 +10,11 @@ export default async function App() {
   return (
     <>
       <Home />
-      {serverConfig?.isVercel && <Analytics />}
+      {serverConfig?.isVercel && (
+        <>
+          <Analytics />
+        </>
+      )}
     </>
   );
 }

@@ -4,6 +4,9 @@ import { SubmitKey } from "../store/config";
 const isApp = !!getClientConfig()?.isApp;
 
 const cn = {
+  Provider: {
+    // OPENAI_DISPLAY_NAME: 'OpenAI'
+  },
   WIP: "该功能仍在开发中……",
   Error: {
     Unauthorized: isApp
@@ -13,13 +16,17 @@ const cn = {
   Auth: {
     Title: "需要密码",
     Tips: "管理员开启了密码验证，请在下方填入访问码",
-    SubTips: "或者输入你的 OpenAI API 密钥",
+    SubTips: "或者输入你的 OpenAI, Google API 或 Anthropic API 密钥",
     Input: "在此处填写访问码",
     Confirm: "确认",
     Later: "稍后再说",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 条对话`,
+    DeleteContent: "删除助手后，无法检索聊天内容。你确定要删除它吗?",
+    DeleteTitle: "删除助手",
+    DeleteCancelBtn: "取消",
+    DeleteOkBtn: "删除",
   },
   Chat: {
     SubTitle: (count: number) => `共 ${count} 条对话`,
@@ -63,12 +70,13 @@ const cn = {
       Masks: "所有面具",
       Clear: "清除聊天",
       Settings: "对话设置",
+      UploadImage: "上传图片",
     },
     Rename: "重命名对话",
     Typing: "正在输入…",
-    Input: (submitKey: string) => {
+    Input: (submitKey: string, isMobileScreen?: boolean) => {
       var inputHints = `${submitKey} 发送`;
-      if (submitKey === String(SubmitKey.Enter)) {
+      if (submitKey === String(SubmitKey.Enter) && !isMobileScreen) {
         inputHints += "，Shift + Enter 换行";
       }
       return inputHints + "，/ 触发补全，: 触发命令";
@@ -79,6 +87,7 @@ const cn = {
       SaveAs: "存为面具",
     },
     IsContext: "预设提示词",
+    SelectModel: "选择模型",
   },
   Export: {
     Title: "分享聊天记录",
@@ -127,8 +136,14 @@ const cn = {
   Settings: {
     Title: "设置",
     SubTitle: "所有设置选项",
-
+    GeneralSettings: "通用设置",
+    ModelSettings: "模型设置",
+    DataSettings: "同步设置",
+    Basic: {
+      Title: "基础设置",
+    },
     Danger: {
+      Title: "系统设置",
       Reset: {
         Title: "重置所有设置",
         SubTitle: "重置所有设置项回默认值",
@@ -158,6 +173,7 @@ const cn = {
     InputTemplate: {
       Title: "用户输入预处理",
       SubTitle: "用户最新的一条消息会填充到此模板",
+      Error: "模板中必须携带占位符{{input}}",
     },
 
     Update: {
@@ -180,6 +196,7 @@ const cn = {
       SubTitle: "根据对话内容生成合适的标题",
     },
     Sync: {
+      Title: "数据设置",
       CloudState: "云端数据",
       NotSyncYet: "还没有进行过同步",
       Success: "同步成功",
@@ -223,6 +240,7 @@ const cn = {
       ImportFailed: "导入失败",
     },
     Mask: {
+      Title: "面具设置",
       Splash: {
         Title: "面具启动页",
         SubTitle: "新建聊天时，展示面具启动页",
@@ -233,6 +251,7 @@ const cn = {
       },
     },
     Prompt: {
+      Title: "提示语设置",
       Disable: {
         Title: "禁用提示词自动补全",
         SubTitle: "在输入框开头输入 / 即可触发自动补全",
@@ -249,6 +268,9 @@ const cn = {
       EditModal: {
         Title: "编辑提示词",
       },
+    },
+    Provider: {
+      Title: "自定义模型",
     },
     HistoryCount: {
       Title: "附带历史消息数",
@@ -270,6 +292,7 @@ const cn = {
     },
 
     Access: {
+      title: "接口设置",
       AccessCode: {
         Title: "访问密码",
         SubTitle: "管理员已开启加密访问",
@@ -312,12 +335,48 @@ const cn = {
           SubTitle: "选择指定的部分版本",
         },
       },
+      Anthropic: {
+        ApiKey: {
+          Title: "接口密钥",
+          SubTitle: "使用自定义 Anthropic Key 绕过密码访问限制",
+          Placeholder: "输入您的 Anthropic API 密钥",
+        },
+
+        Endpoint: {
+          Title: "接口地址",
+          SubTitle: "样例：",
+        },
+
+        ApiVerion: {
+          Title: "接口版本 (claude api version)",
+          SubTitle: "选择一个特定的 API 版本输入",
+        },
+      },
+      Google: {
+        ApiKey: {
+          Title: "API 密钥",
+          SubTitle: "从 Google AI 获取您的 API 密钥",
+          Placeholder: "输入您的 Google AI Studio API 密钥",
+        },
+
+        Endpoint: {
+          Title: "终端地址",
+          SubTitle: "示例：",
+        },
+
+        ApiVersion: {
+          Title: "API 版本（仅适用于 gemini-pro）",
+          SubTitle: "选择一个特定的 API 版本",
+        },
+      },
       CustomModel: {
         Title: "自定义模型名",
         SubTitle: "增加自定义模型可选项，使用英文逗号隔开",
       },
     },
-
+    Models: {
+      Title: "模型设置",
+    },
     Model: "模型 (model)",
     Temperature: {
       Title: "随机性 (temperature)",
@@ -347,7 +406,7 @@ const cn = {
     Prompt: {
       History: (content: string) => "这是历史聊天总结作为前情提要：" + content,
       Topic:
-        "使用四到五个字直接返回这句话的简要主题，不要解释、不要标点、不要语气词、不要多余文本，如果没有主题，请直接返回“闲聊”",
+        "使用四到五个字直接返回这句话的简要主题，不要解释、不要标点、不要语气词、不要多余文本，不要加粗，如果没有主题，请直接返回“闲聊”",
       Summarize:
         "简要总结一下对话内容，用作后续的上下文提示 prompt，控制在 200 字以内",
     },
@@ -364,8 +423,8 @@ const cn = {
     Toast: (x: any) => `包含 ${x} 条预设提示词`,
     Edit: "当前对话设置",
     Add: "新增一条对话",
-    Clear: "上下文已清除",
-    Revert: "恢复上下文",
+    Clear: "解除以上内容关联",
+    Revert: "撤销",
   },
   Plugin: {
     Name: "插件",
@@ -441,13 +500,16 @@ const cn = {
     Config: "配置",
   },
   Exporter: {
-    Description : {
-      Title: "只有清除上下文之后的消息会被展示"
-    },  
+    Description: {
+      Title: "只有清除上下文之后的消息会被展示",
+    },
     Model: "模型",
     Messages: "消息",
     Topic: "主题",
     Time: "时间",
+  },
+  Discover: {
+    SearchPlaceholder: "搜索助手",
   },
 };
 

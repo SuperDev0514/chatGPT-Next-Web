@@ -1,5 +1,4 @@
-import { GPTText } from "./utils/prompts/gpt-text";
-import { GPTVoice } from "./utils/prompts/gpt-voice";
+
 
 export const OWNER = "Yidadaa";
 export const REPO = "ChatGPT-Next-Web";
@@ -11,9 +10,11 @@ export const FETCH_COMMIT_URL = `https://api.github.com/repos/${OWNER}/${REPO}/c
 export const FETCH_TAG_URL = `https://api.github.com/repos/${OWNER}/${REPO}/tags?per_page=1`;
 export const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 
-export const DEFAULT_CORS_HOST = "https://a.nextweb.fun";
-export const DEFAULT_API_HOST = `${DEFAULT_CORS_HOST}/api/proxy`;
+export const DEFAULT_API_HOST = "https://api.nextchat.dev";
 export const OPENAI_BASE_URL = "https://api.openai.com";
+export const ANTHROPIC_BASE_URL = "https://api.anthropic.com";
+
+export const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/";
 
 export enum Path {
   Home = "/",
@@ -25,8 +26,9 @@ export enum Path {
 }
 
 export enum ApiPath {
-  Cors = "/api/cors",
+  Cors = "",
   OpenAI = "/api/openai",
+  Anthropic = "/api/anthropic",
 }
 
 export enum SlotID {
@@ -47,12 +49,20 @@ export enum StoreKey {
   Prompt = "prompt-store",
   Update = "chat-update",
   Sync = "sync",
+  Provider = "provider",
 }
 
-export const DEFAULT_SIDEBAR_WIDTH = 300;
-export const MAX_SIDEBAR_WIDTH = 500;
-export const MIN_SIDEBAR_WIDTH = 230;
 export const NARROW_SIDEBAR_WIDTH = 100;
+
+export const DEFAULT_SIDEBAR_WIDTH = 340;
+export const MAX_SIDEBAR_WIDTH = 440;
+export const MIN_SIDEBAR_WIDTH = 230;
+
+export const WINDOW_WIDTH_SM = 480;
+export const WINDOW_WIDTH_MD = 768;
+export const WINDOW_WIDTH_LG = 1120;
+export const WINDOW_WIDTH_XL = 1440;
+export const WINDOW_WIDTH_2XL = 1980;
 
 export const ACCESS_CODE_PREFIX = "nk-";
 
@@ -68,7 +78,24 @@ export const EXPORT_MESSAGE_CLASS_NAME = "export-markdown";
 export enum ServiceProvider {
   OpenAI = "OpenAI",
   Azure = "Azure",
+  Google = "Google",
+  Anthropic = "Anthropic",
+  DeepSeek = "DeepSeek",
 }
+
+export enum ModelProvider {
+  GPT = "GPT",
+  GeminiPro = "GeminiPro",
+  Claude = "Claude",
+  Deepseek = "DeepSeek",
+}
+
+export const Anthropic = {
+  ChatPath: "v1/messages",
+  ChatPath1: "v1/complete",
+  ExampleEndpoint: "https://api.anthropic.com",
+  Vision: "2023-06-01",
+};
 
 export const OpenaiPath = {
   ChatPath: "v1/chat/completions",
@@ -82,76 +109,114 @@ export const Azure = {
   ExampleEndpoint: "https://{resource-url}/openai/deployments/{deploy-id}",
 };
 
+export const Google = {
+  ExampleEndpoint: "https://generativelanguage.googleapis.com/",
+  ChatPath: (modelName: string) => `v1beta/models/${modelName}:generateContent`,
+
+};
+
 export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
-// export const DEFAULT_SYSTEM_TEMPLATE = GPTText;
-export const DEFAULT_SYSTEM_TEMPLATE = GPTVoice;
+
 
 export const SUMMARIZE_MODEL = "gpt-3.5-turbo";
+export const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
 
 export const KnowledgeCutOffDate: Record<string, string> = {
   default: "2021-09",
-  "gpt-4-1106-preview": "2023-04",
+  "gpt-4-turbo": "2023-12",
+  "gpt-4-turbo-2024-04-09": "2023-12",
+  "gpt-4-turbo-preview": "2023-12",
+  "gpt-4o": "2023-10",
+  "gpt-4o-2024-05-13": "2023-10",
   "gpt-4-vision-preview": "2023-04",
+  // After improvements,
+  // it's now easier to add "KnowledgeCutOffDate" instead of stupid hardcoding it, as was done previously.
+  "gemini-pro": "2023-12",
+  "gemini-pro-vision": "2023-12",
 };
 
+const openaiModels = [
+  "gpt-3.5-turbo",
+  "gpt-4",
+  "gpt-4-32k",
+  "gpt-4-turbo",
+  "gpt-4-turbo-preview",
+  "gpt-4o",
+  "gpt-4o-2024-05-13",
+  "gpt-4-vision-preview",
+
+];
+
+const googleModels = [
+  "gemini-1.0-pro",
+  "gemini-1.5-pro-latest",
+  "gemini-1.5-flash-latest",
+  "gemini-pro-vision",
+];
+
+const anthropicModels = [
+  "claude-instant-1.2",
+  "claude-2.0",
+  "claude-2.1",
+  "claude-3-sonnet-20240229",
+  "claude-3-opus-20240229",
+  "claude-3-haiku-20240307",
+];
+
+const deepseekModels = ["deepseek-chat"];
+
 export const DEFAULT_MODELS = [
-  {
-    name: "gpt-4",
+  ...openaiModels.map((name) => ({
+    name,
     available: true,
-  },
-  {
-    name: "gpt-4-0314",
+    provider: {
+      id: "openai",
+      providerName: "OpenAI",
+      providerType: "openai",
+    },
+  })),
+  ...googleModels.map((name) => ({
+    name,
     available: true,
-  },
-  {
-    name: "gpt-4-0613",
+    provider: {
+      id: "google",
+      providerName: "Google",
+      providerType: "google",
+    },
+  })),
+  ...anthropicModels.map((name) => ({
+    name,
     available: true,
-  },
-  {
-    name: "gpt-4-32k",
+    provider: {
+      id: "anthropic",
+      providerName: "Anthropic",
+      providerType: "anthropic",
+    },
+  })),
+  ...deepseekModels.map((name) => ({
+    name,
     available: true,
-  },
-  {
-    name: "gpt-4-32k-0314",
-    available: true,
-  },
-  {
-    name: "gpt-4-32k-0613",
-    available: true,
-  },
-  {
-    name: "gpt-4-1106-preview",
-    available: true,
-  },
-  {
-    name: "gpt-4-vision-preview",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo-0301",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo-0613",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo-1106",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo-16k",
-    available: true,
-  },
-  {
-    name: "gpt-3.5-turbo-16k-0613",
-    available: true,
-  },
+    provider: {
+      id: "deepseek",
+      providerName: "DeepSeek",
+      providerType: "deepseek",
+    },
+  })),
 ] as const;
 
 export const CHAT_PAGE_SIZE = 15;
 export const MAX_RENDER_MSG_COUNT = 45;
+
+// some famous webdav endpoints
+export const internalAllowedWebDavEndpoints = [
+  "https://dav.jianguoyun.com/dav/",
+  "https://dav.dropdav.com/",
+  "https://dav.box.com/dav",
+  "https://nanao.teracloud.jp/dav/",
+  "https://webdav.4shared.com/",
+  "https://dav.idrivesync.com",
+  "https://webdav.yandex.com",
+  "https://app.koofr.net/dav/Koofr",
+];
+
+export const SIDEBAR_ID = "sidebar";

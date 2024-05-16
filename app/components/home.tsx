@@ -14,7 +14,7 @@ import LoadingIcon from "../icons/three-dots.svg";
 import { getCSSVar, useMobileScreen } from "../utils";
 
 import dynamic from "next/dynamic";
-import { Path, SlotID } from "../constant";
+import { ModelProvider, Path, SlotID } from "../constant";
 import { ErrorBoundary } from "./error";
 
 import { getISOLang, getLang } from "../locales";
@@ -29,8 +29,7 @@ import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 import { getClientConfig } from "../config/client";
-import { api } from "../client/api";
-import { useAccessStore } from "../store";
+
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -130,8 +129,7 @@ function Screen() {
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
   const isMobileScreen = useMobileScreen();
-  const shouldTightBorder =
-    getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
+
 
   useEffect(() => {
     loadAsyncGoogleFont();
@@ -172,6 +170,14 @@ function Screen() {
 export function useLoadData() {
   const config = useAppConfig();
 
+  var api: ClientApi;
+  if (config.modelConfig.model.startsWith("gemini")) {
+    api = new ClientApi(ModelProvider.GeminiPro);
+  } else if (identifyDefaultClaudeModel(config.modelConfig.model)) {
+    api = new ClientApi(ModelProvider.Claude);
+  } else {
+    api = new ClientApi(ModelProvider.GPT);
+  }
   useEffect(() => {
     (async () => {
       const models = await api.llm.models();

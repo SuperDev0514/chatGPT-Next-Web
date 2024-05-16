@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import { showToast } from "./components/ui-lib";
 import Locale from "./locales";
+import { RequestMessage } from "./client/api";
 
 export function trimTopic(topic: string) {
-  return topic.replace(/[，。！？”“"、,.!?]*$/, "");
+  // Fix an issue where double quotes still show in the Indonesian language
+  // This will remove the specified punctuation from the end of the string
+  // and also trim quotes from both the start and end if they exist.
+  return (
+    topic
+      // fix for gemini
+      .replace(/^["“”*]+|["“”*]+$/g, "")
+      .replace(/[，。！？”“"、,.!?*]*$/, "")
+  );
 }
 
 export async function copyToClipboard(text: string) {
@@ -37,8 +47,8 @@ export async function downloadAs(text: string, filename: string) {
       defaultPath: `${filename}`,
       filters: [
         {
-          name: `${filename.split('.').pop()} files`,
-          extensions: [`${filename.split('.').pop()}`],
+          name: `${filename.split(".").pop()} files`,
+          extensions: [`${filename.split(".").pop()}`],
         },
         {
           name: "All Files",
@@ -49,10 +59,7 @@ export async function downloadAs(text: string, filename: string) {
 
     if (result !== null) {
       try {
-        await window.__TAURI__.fs.writeBinaryFile(
-          result,
-          new Uint8Array([...text].map((c) => c.charCodeAt(0)))
-        );
+        await window.__TAURI__.fs.writeTextFile(result, text);
         showToast(Locale.Download.Success);
       } catch (error) {
         showToast(Locale.Download.Failed);
@@ -66,16 +73,17 @@ export async function downloadAs(text: string, filename: string) {
       "href",
       "data:text/plain;charset=utf-8," + encodeURIComponent(text),
     );
-  element.setAttribute("download", filename);
+    element.setAttribute("download", filename);
 
-  element.style.display = "none";
-  document.body.appendChild(element);
+    element.style.display = "none";
+    document.body.appendChild(element);
 
-  element.click();
+    element.click();
 
-  document.body.removeChild(element);
+    document.body.removeChild(element);
+  }
 }
-}
+
 export function readFromFile() {
   return new Promise<string>((res, rej) => {
     const fileInput = document.createElement("input");
@@ -209,8 +217,51 @@ export function getCSSVar(varName: string) {
 export function isMacOS(): boolean {
   if (typeof window !== "undefined") {
     let userAgent = window.navigator.userAgent.toLocaleLowerCase();
-    const macintosh = /iphone|ipad|ipod|macintosh/.test(userAgent)
-    return !!macintosh
+    const macintosh = /iphone|ipad|ipod|macintosh/.test(userAgent);
+    return !!macintosh;
   }
-  return false
+  return false;
+}
+
+export function getMessageTextContent(message: RequestMessage) {
+  if (typeof message.content === "string") {
+    return message.content;
+  }
+  for (const c of message.content) {
+    if (c.type === "text") {
+      return c.text ?? "";
+    }
+  }
+  return "";
+}
+
+export function getMessageImages(message: RequestMessage): string[] {
+  if (typeof message.content === "string") {
+    return [];
+  }
+  const urls: string[] = [];
+  for (const c of message.content) {
+    if (c.type === "image_url") {
+      urls.push(c.image_url?.url ?? "");
+    }
+  }
+  return urls;
+}
+
+export function isVisionModel(model: string) {
+  // Note: This is a better way using the TypeScript feature instead of `&&` or `||` (ts v5.5.0-dev.20240314 I've been using)
+
+
+  return (
+    visionKeywords.some((keyword) => model.includes(keyword)) || isGpt4Turbo
+  );
+}
+
+export function getTime(dateTime: string) {
+  const time = dayjs(dateTime);
+  const now = dayjs();
+  if (time.isBefore(now, "date")) {
+    return time.format("MM-DD");
+  }
+  return time.format("hh:mm");
 }
