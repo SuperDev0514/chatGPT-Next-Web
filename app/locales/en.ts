@@ -15,7 +15,7 @@ const en: LocaleType = {
   Auth: {
     Title: "Need Access Code",
     Tips: "Please enter access code below",
-    SubTips: "Or enter your OpenAI or Google API Key",
+    SubTips: "Or enter your OpenAI, Google API Key or Anthropic API Key",
     Input: "access code",
     Confirm: "Confirm",
     Later: "Later",
@@ -317,7 +317,7 @@ const en: LocaleType = {
 
         Endpoint: {
           Title: "OpenAI Endpoint",
-          SubTitle: "Must starts with http(s):// or use /api/openai as default",
+          SubTitle: "Must start with http(s):// or use /api/openai as default",
         },
       },
       Azure: {
@@ -342,7 +342,7 @@ const en: LocaleType = {
           Title: "Anthropic API Key",
           SubTitle:
             "Use a custom Anthropic Key to bypass password access restrictions",
-          Placeholder: "Anthropic API Key",
+          Placeholder: "Enter your Anthropic API Key",
         },
 
         Endpoint: {
