@@ -212,6 +212,10 @@ anthropic claude Api version.
 
 anthropic claude Api Url.
 
+### `DEEPSEEK_API_KEY` (optional)
+
+deepseek Api Key.
+
 ### `HIDE_USER_API_KEY` (optional)
 
 > Default: Empty
@@ -245,11 +249,12 @@ To control custom models, use `+` to add a custom model, use `-` to hide a model
 
 User `-all` to disable all default models, `+all` to enable all default models.
 
-### `WHITE_WEBDEV_ENDPOINTS` (optional)
+
 
 You can use this option if you want to increase the number of webdav service addresses you are allowed to access, as required by the format：
-- Each address must be a complete endpoint 
-> `https://xxxx/yyy`
+
+- Each address must be a complete endpoint
+  > `https://xxxx/yyy`
 - Multiple addresses are connected by ', '
 
 ### `DEFAULT_INPUT_TEMPLATE` (optional)

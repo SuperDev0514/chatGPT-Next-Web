@@ -1,3 +1,5 @@
+import { Chat } from "./components/chat";
+
 export const OWNER = "Yidadaa";
 export const REPO = "ChatGPT-Next-Web";
 export const REPO_URL = `https://github.com/${OWNER}/${REPO}`;
@@ -78,12 +80,14 @@ export enum ServiceProvider {
   Azure = "Azure",
   Google = "Google",
   Anthropic = "Anthropic",
+  DeepSeek = "DeepSeek",
 }
 
 export enum ModelProvider {
   GPT = "GPT",
   GeminiPro = "GeminiPro",
   Claude = "Claude",
+  Deepseek = "DeepSeek",
 }
 
 export const Anthropic = {
@@ -147,18 +151,14 @@ export const KnowledgeCutOffDate: Record<string, string> = {
 
 const openaiModels = [
   "gpt-3.5-turbo",
-  "gpt-3.5-turbo-1106",
-  "gpt-3.5-turbo-0125",
   "gpt-4",
-  "gpt-4-0613",
   "gpt-4-32k",
-  "gpt-4-32k-0613",
   "gpt-4-turbo",
   "gpt-4-turbo-preview",
   "gpt-4o",
   "gpt-4o-2024-05-13",
   "gpt-4-vision-preview",
-  "gpt-4-turbo-2024-04-09"
+
 ];
 
 const googleModels = [
@@ -176,6 +176,8 @@ const anthropicModels = [
   "claude-3-opus-20240229",
   "claude-3-haiku-20240307",
 ];
+
+const deepseekModels = ["deepseek-chat"];
 
 export const DEFAULT_MODELS = [
   ...openaiModels.map((name) => ({
@@ -203,6 +205,15 @@ export const DEFAULT_MODELS = [
       id: "anthropic",
       providerName: "Anthropic",
       providerType: "anthropic",
+    },
+  })),
+  ...deepseekModels.map((name) => ({
+    name,
+    available: true,
+    provider: {
+      id: "deepseek",
+      providerName: "DeepSeek",
+      providerType: "deepseek",
     },
   })),
 ] as const;
