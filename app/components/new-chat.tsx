@@ -17,21 +17,13 @@ import { useCommand } from "../command";
 import { showConfirm } from "./ui-lib";
 import { BUILTIN_MASK_STORE } from "../masks";
 
-function getIntersectionArea(aRect: DOMRect, bRect: DOMRect) {
-  const xmin = Math.max(aRect.x, bRect.x);
-  const xmax = Math.min(aRect.x + aRect.width, bRect.x + bRect.width);
-  const ymin = Math.max(aRect.y, bRect.y);
-  const ymax = Math.min(aRect.y + aRect.height, bRect.y + bRect.height);
-  const width = xmax - xmin;
-  const height = ymax - ymin;
-  const intersectionArea = width < 0 || height < 0 ? 0 : width * height;
-  return intersectionArea;
-}
-
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
     <div className={styles["mask"]} onClick={props.onClick}>
-      <MaskAvatar mask={props.mask} />
+      <MaskAvatar
+        avatar={props.mask.avatar}
+        model={props.mask.modelConfig.model}
+      />
       <div className={styles["mask-name"] + " one-line"}>{props.mask.name}</div>
     </div>
   );
@@ -103,8 +95,7 @@ export function NewChat() {
   useCommand({
     mask: (id) => {
       try {
-        const intId = parseInt(id);
-        const mask = maskStore.get(intId) ?? BUILTIN_MASK_STORE.get(intId);
+        const mask = maskStore.get(id) ?? BUILTIN_MASK_STORE.get(id);
         startChat(mask ?? undefined);
       } catch {
         console.error("[New Chat] failed to create chat from mask id=", id);
