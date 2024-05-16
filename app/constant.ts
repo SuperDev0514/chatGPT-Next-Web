@@ -1,4 +1,4 @@
-import { Chat } from "./components/chat";
+
 
 export const OWNER = "Yidadaa";
 export const REPO = "ChatGPT-Next-Web";
@@ -102,6 +102,7 @@ export const OpenaiPath = {
   UsagePath: "dashboard/billing/usage",
   SubsPath: "dashboard/billing/subscription",
   ListModelPath: "v1/models",
+  Speech: "v1/audio/speech",
 };
 
 export const Azure = {
@@ -115,22 +116,7 @@ export const Google = {
 };
 
 export const DEFAULT_INPUT_TEMPLATE = `{{input}}`; // input / time / model / lang
-// export const DEFAULT_SYSTEM_TEMPLATE = `
-// You are ChatGPT, a large language model trained by {{ServiceProvider}}.
-// Knowledge cutoff: {{cutoff}}
-// Current model: {{model}}
-// Current time: {{time}}
-// Latex inline: $x^2$
-// Latex block: $$e=mc^2$$
-// `;
-export const DEFAULT_SYSTEM_TEMPLATE = `
-You are ChatGPT, a large language model trained by {{ServiceProvider}}.
-Knowledge cutoff: {{cutoff}}
-Current model: {{model}}
-Current time: {{time}}
-Latex inline: \\(x^2\\) 
-Latex block: $$e=mc^2$$
-`;
+
 
 export const SUMMARIZE_MODEL = "gpt-3.5-turbo";
 export const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
