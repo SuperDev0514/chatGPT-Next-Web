@@ -426,7 +426,7 @@ export function ChatActions(props: {
   uploading: boolean;
 }) {
   const config = useAppConfig();
-  const navigate = useNavigate();
+  const router = useRouter();
   const chatStore = useChatStore();
 
   // switch themes
@@ -541,7 +541,8 @@ export function ChatActions(props: {
 
       <ChatAction
         onClick={() => {
-          navigate(Path.Masks);
+          // navigate(Path.Masks);
+          router.push(Path.Masks);
         }}
         text={Locale.Chat.InputActions.Masks}
         icon={<MaskIcon />}
