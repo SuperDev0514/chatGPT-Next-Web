@@ -60,15 +60,23 @@ export class ChatGPTApi implements LLMApi {
   path(path: string): string {
     const accessStore = useAccessStore.getState();
 
-    const isAzure = accessStore.provider === ServiceProvider.Azure;
+    let baseUrl = "";
 
-    if (isAzure && !accessStore.isValidAzure()) {
-      throw Error(
-        "incomplete azure config, please check it in your settings page",
-      );
+    if (accessStore.useCustomConfig) {
+      const isAzure = accessStore.provider === ServiceProvider.Azure;
+
+      if (isAzure && !accessStore.isValidAzure()) {
+        throw Error(
+          "incomplete azure config, please check it in your settings page",
+        );
+      }
+
+      if (isAzure) {
+        path = makeAzurePath(path, accessStore.azureApiVersion);
+      }
+
+      baseUrl = isAzure ? accessStore.azureUrl : accessStore.openaiUrl;
     }
-
-    let baseUrl = isAzure ? accessStore.azureUrl : accessStore.openaiUrl;
 
     if (baseUrl.length === 0) {
       const isApp = !!getClientConfig()?.isApp;
@@ -82,10 +90,6 @@ export class ChatGPTApi implements LLMApi {
     }
     if (!baseUrl.startsWith("http") && !baseUrl.startsWith(ApiPath.OpenAI)) {
       baseUrl = "https://" + baseUrl;
-    }
-
-    if (isAzure) {
-      path = makeAzurePath(path, accessStore.azureApiVersion);
     }
 
     console.log("[Proxy Endpoint] ", baseUrl, path);
@@ -125,7 +129,7 @@ export class ChatGPTApi implements LLMApi {
     };
 
     // add max_tokens to vision model
-    if (visionModel) {
+    if (visionModel && modelConfig.model.includes("preview")) {
       requestPayload["max_tokens"] = Math.max(modelConfig.max_tokens, 4000);
     }
 
@@ -382,5 +386,28 @@ export class ChatGPTApi implements LLMApi {
       },
     }));
   }
+
+  public cache: Record<string, ArrayBuffer> = {};
+
+  async speech(input: string): Promise<ArrayBuffer> {
+    if (this.cache[input]) return this.cache[input].slice(0);
+
+    const res = await fetch(this.path(OpenaiPath.Speech), {
+      method: "POST",
+      headers: {
+        ...getHeaders(),
+      },
+      body: JSON.stringify({
+        model: "tts-1",
+        input: input,
+        voice: "onyx",
+      }),
+    });
+
+    const arrayBuffer = await res.arrayBuffer();
+    this.cache[input] = arrayBuffer.slice(0);
+    return arrayBuffer;
+  }
 }
+
 export { OpenaiPath };
